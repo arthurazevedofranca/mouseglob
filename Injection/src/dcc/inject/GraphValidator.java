@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Builds and validates a dependency graph for the custom DI framework.
@@ -30,13 +31,14 @@ public final class GraphValidator {
     }
 
     public static ValidationResult validate(Indexer indexer, Context context) {
-        Graph<Class<?>> g = buildGraph(indexer);
-        List<List<Class<?>>> cycles = detectCycles(g);
-        List<String> missing = findMissingBindings(indexer, g);
-        String report = buildReport(g, context, cycles, missing);
+        Graph<Class<?>> fullGraph = buildGraph(indexer);
+        Graph<Class<?>> constructorGraph = buildGraph(indexer, InjectionUtils::getRequiredConstructorDependencies);
+        List<List<Class<?>>> cycles = detectCycles(constructorGraph);
+        List<String> missing = findMissingBindings(indexer, fullGraph);
+        String report = buildReport(fullGraph, context, cycles, missing);
         boolean ok = cycles.isEmpty() && missing.isEmpty();
         if (ok) {
-            log.info("DI validation OK. Nodes: {} Edges: {}", g.getNodes().size(), g.getEdges().stream().mapToInt(Set::size).sum());
+            log.info("DI validation OK. Nodes: {} Edges: {}", fullGraph.getNodes().size(), fullGraph.getEdges().stream().mapToInt(Set::size).sum());
         } else {
             log.warn("DI validation FAILED. cycles={}, missing={} (see report)", cycles.size(), missing.size());
         }
@@ -44,13 +46,17 @@ public final class GraphValidator {
     }
 
     public static Graph<Class<?>> buildGraph(Indexer indexer) {
+        return buildGraph(indexer, InjectionUtils::getRequiredDependencies);
+    }
+
+    public static Graph<Class<?>> buildGraph(Indexer indexer, Function<Class<?>, Set<Class<?>>> dependencyResolver) {
         Graph<Class<?>> g = new Graph<>();
         Set<Class<?>> nodes = new LinkedHashSet<>(indexer.getClassesToInstantiate());
         for (Class<?> n : nodes) {
             g.addNode(n);
         }
         for (Class<?> n : nodes) {
-            for (Class<?> dep : InjectionUtils.getRequiredDependencies(n)) {
+            for (Class<?> dep : dependencyResolver.apply(n)) {
                 g.addEdge(n, dep);
                 if (!g.hasNode(dep)) g.addNode(dep);
             }
@@ -132,7 +138,7 @@ public final class GraphValidator {
             }
         }
         if (!cycles.isEmpty()) {
-            sb.append("\nCycles detected (" + cycles.size() + "):\n");
+            sb.append("\nCycles detected in constructor dependency graph (" + cycles.size() + "):\n");
             int i = 1;
             for (List<Class<?>> cyc : cycles) {
                 sb.append("  ").append(i++).append(": ");

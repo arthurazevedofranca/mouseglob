@@ -73,21 +73,14 @@ public final class InjectionUtils {
 		return dependenciesOfType;
 	}
 
-	public static Set<Class<?>> getRequiredDependencies(Class<?> clazz) {
-		Set<Class<?>> dependencies = new HashSet<>();
+        public static Set<Class<?>> getRequiredDependencies(Class<?> clazz) {
+                Set<Class<?>> dependencies = new HashSet<>();
 
-		for (Constructor<?> constructor : getConstructors(clazz)) {
-			Class<?>[] types = constructor.getParameterTypes();
-			Annotation[][] annotations = constructor.getParameterAnnotations();
-			for (int i = 0; i < types.length; i++) {
-				if (isRequiredParameter(types[i], annotations[i]))
-					dependencies.add(types[i]);
-			}
-		}
+                dependencies.addAll(getRequiredConstructorDependencies(clazz));
 
-		for (Field field : getFields(clazz))
-			if (!field.isAnnotationPresent(Optional.class))
-				dependencies.add(field.getType());
+                for (Field field : getFields(clazz))
+                        if (!field.isAnnotationPresent(Optional.class))
+                                dependencies.add(field.getType());
 
 		for (Method method : getMethods(clazz)) {
 			Class<?>[] types = method.getParameterTypes();
@@ -98,8 +91,23 @@ public final class InjectionUtils {
 			}
 		}
 
-		return dependencies;
-	}
+                return dependencies;
+        }
+
+        public static Set<Class<?>> getRequiredConstructorDependencies(Class<?> clazz) {
+                Set<Class<?>> dependencies = new HashSet<>();
+
+                for (Constructor<?> constructor : getConstructors(clazz)) {
+                        Class<?>[] types = constructor.getParameterTypes();
+                        Annotation[][] annotations = constructor.getParameterAnnotations();
+                        for (int i = 0; i < types.length; i++) {
+                                if (isRequiredParameter(types[i], annotations[i]))
+                                        dependencies.add(types[i]);
+                        }
+                }
+
+                return dependencies;
+        }
 
 	private static boolean isRequiredParameter(Class<?> type,
 			Annotation[] annotations) {
