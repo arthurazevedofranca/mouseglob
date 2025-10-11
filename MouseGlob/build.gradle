@@ -1,3 +1,5 @@
+import org.gradle.api.file.RelativePath
+
 plugins {
     id 'application'
 }
@@ -37,6 +39,23 @@ sourceSets {
     test {
         java.srcDirs = ['src/test/java']
         resources.srcDirs = []
+    }
+}
+
+tasks.named('processResources') {
+    includeEmptyDirs = false
+    eachFile { details ->
+        String path = details.relativePath.pathString
+        if (details.isDirectory()) {
+            return
+        }
+        if (path == 'logback.xml' ||
+                path.startsWith('META-INF/') ||
+                path.startsWith('data/') ||
+                path.startsWith('dcc/mouseglob/')) {
+            return
+        }
+        details.relativePath = new RelativePath(false, 'resource', *details.relativePath.segments)
     }
 }
 
