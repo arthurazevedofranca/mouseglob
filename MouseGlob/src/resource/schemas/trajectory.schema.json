@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/mouseglob/trajectory.schema.json",
+  "title": "MouseGlob Trajectory NDJSON",
+  "description": "Newline-delimited JSON stream containing a metadata object then zero or more frame records.",
+  "type": "object",
+  "oneOf": [
+    {
+      "title": "Metadata",
+      "properties": {
+        "type": {"const": "meta"},
+        "version": {"type": "string"},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1},
+        "scale_cm_per_px": {"type": "number", "minimum": 0},
+        "zones": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "trackers": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "required": ["type", "version", "width", "height", "scale_cm_per_px"],
+      "additionalProperties": true
+    },
+    {
+      "title": "Frame",
+      "properties": {
+        "type": {"const": "frame"},
+        "t_ms": {"type": "integer", "minimum": 0},
+        "trackers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "x_cm": {"type": "number"},
+              "y_cm": {"type": "number"},
+              "zones_dt_ms": {
+                "type": "object",
+                "additionalProperties": {"type": "integer", "minimum": 0}
+              }
+            },
+            "required": ["name", "x_cm", "y_cm"]
+          }
+        },
+        "keys": {"type": "string"}
+      },
+      "required": ["type", "t_ms", "trackers"]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "stages": [
+    { "type": "grayscale" },
+    { "type": "background", "mode": "running", "alpha": 0.02 },
+    { "type": "adaptiveThreshold", "mode": "adaptiveMean", "dark": false, "blockSize": 15, "c": 5 },
+    { "type": "morphology", "operation": "open", "kernel": "3x3" }
+  ]
+}

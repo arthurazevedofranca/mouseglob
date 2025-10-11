@@ -1,0 +1,2 @@
+dcc.inject.test.Bar
+dcc.inject.test.Foo

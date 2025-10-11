@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/mouseglob/experiment.schema.json",
+  "title": "MouseGlob Experiment",
+  "type": "object",
+  "properties": {
+    "version": {"type": "string"},
+    "date": {"type": "string"},
+    "movie": {
+      "type": "object",
+      "properties": {
+        "file": {"type": "string"},
+        "position": {"type": "number"}
+      },
+      "required": ["file"]
+    },
+    "trajectories": {
+      "type": "object",
+      "properties": {
+        "file": {"type": "string"},
+        "format": {"enum": ["csv", "ndjson", "parquet"]}
+      },
+      "required": ["file"]
+    },
+    "maze": {
+      "type": "object",
+      "properties": {
+        "file": {"type": "string"}
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "properties": {
+        "scale_cm_per_px": {"type": "number", "minimum": 0}
+      }
+    },
+    "analyses": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "keys": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "required": ["version"]
+}

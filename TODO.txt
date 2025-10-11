@@ -1,0 +1,86 @@
+1. Create Experiment...
+    1. Name Experiment
+    2. Choose video file
+    3. Calibrate
+    4. Setup Maze
+    5. Setup Tracking
+    6. Add Trackers
+    7. Choose Analyses
+2. Run Experiment
+3. Collect Reports
+
+FIXED	polygon zone and boundary not mutex -> NullPointerException
+FIXED	key event: key not showing in inspector
+FIXED	movie jump not working (springs back to current position)
+FIXED	fix coords file path
+FIXED	scale format in coords file is not localized
+DONE	keep last browsed directory
+DONE	export boundaries and zones in column pairs (xy,xy,xy...)
+DONE	apply boundaries mask directly inside trackers instead of whole image
+DONE	associate trackers to boundaries
+DONE	add EmptyBorder to tree nodes to provide padding between rows
+FIXED	scale was not loaded from file
+DONE	light zones up when trackers visit
+DONE	inspector panel is correctly cleared when the selected inspectable is removed or a non-inspectable object is selected
+DONE	jump movie when loading experiment
+DONE	export movie boundaries to ^ file
+DONE	display plot axis labels
+DONE	suppress Image.copy() calls in TrackingManager.process() -> add buffer parameter to image operations
+DONE	manage redrawing of PlotApplets -> now asynchronous
+PARTIAL	(log key events in live video stream into a .SRT file): try to order events by start time
+DONE	dynamically load external modules
+DONE	PositionAnalysis is not absolute
+DONE	export PlotReport to images (PNG, JPG)
+FIXED	Angle plot not updating
+DONE	create experiment summary plots
+FIXED	VisitEventListener report not updating
+DONE	export report data to clipboard
+DONE	move all tracking series into Trajectory (rename?) -> became Dataset
+FIXED	movie broadcasts first frame before jumping to load position (toggle analyses update with Record button)
+DONE	include calibration information when calculating/displaying analyses
+DONE	draw ColorBar outside of HeatMap
+DONE	sort Analyses alphabetically on selection dialog
+DONE	display statistics
+DONE	copy smoothed curve to clipboard
+FIXED	correct MouseModel for calibration
+FIXED	investigate synchronization bug: NPE in Series1D.get(int) when using SmoothedSeries
+FIXED	when smoothed, series doesn't update in plot
+FIXED	Summary report not updating in real-time
+DONE	save and load selected Analyses to/from Experiment file
+DONE	parallelize Optimizer and ScalarMap Operations
+DONE	parallelize image processing with ForkJoin
+DONE	Tracker head painted in wrong position when Tracker is out of the top and left borders
+FIXED	when selecting Tracking on the tree, resets tracking background
+DONE	put Probe in a status bar instead of hovering over the Plot
+DONE	implement primitive double List without autoboxing/unboxing
+DONE	correct Axis width measurement (implement Tick?)
+DONE	obtain background image when loading difference mode experiment
+DONE	SpontaneousAlternationReport
+DONE	complete alternation report
+DONE	parallelize BinaryImage operations (dilate/erode)
+DONE	implemented DoubleMatrixPool to recycle 'double[][]'s and reduce memory usage in Scalar/Vector/TensorMaps
+DONE	implemented IntegerArrayPool to recycle 'int[]'s and reduce memory usage in Images
+DONE	set Visit duration threshold, to join close events or discard short ones
+FIXED	fix FilteredTimedEvent Statistics updating when event resumed
+DONE	implement Time search
+DONE	update VisitEvent masks inside VisitAnalysis.update() to avoid recalculating
+DONE	calculate distance statistics inside of zone
+DONE	add option to adjust HeatMap scale (log-scale)
+
+implement area analyses (area inside zone, freezing)
+PropertyInspectors don't update and disappear after reselecting the Inspector
+open WMV files!
+add headers to text reports with movie file name (+ tracker name)
+export Analysis results to file
+distinguish mouse head and tail
+pause at the end of the movie
+shape drawing not to scale (if Applet painting scale not 1:1)
+re-enable fast-forwarding
+localize values copied to clipboard
+CSV files were not correctly opened in Excel in pt_BR locale
+
+future:
+bypass processing.Movie library and manipulate GStreamer directly
+nudge shapes (move them altogether, mouse/kb)
+position and angle histograms
+implement Java2D plot rendering

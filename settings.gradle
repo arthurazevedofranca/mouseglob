@@ -1,0 +1,4 @@
+rootProject.name = 'MouseGlob'
+include ':Injection', ':MouseGlob'
+project(':Injection').projectDir = file('Injection')
+project(':MouseGlob').projectDir = file('MouseGlob')
