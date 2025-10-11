@@ -10,7 +10,6 @@
  ******************************************************************************/
 package dcc.mouseglob.movie;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -53,15 +52,13 @@ public class MovieController extends AbstractController<MovieModule> implements
 	@Inject
 	private ExperimentIOManager experimentIOManager;
 
-	private Component parent;
-
 	private FileChooser fileChooser;
 
 	@Inject
 	private MovieManager movieManager;
 
 	@Inject
-	MovieController(Component parent) {
+        MovieController() {
 		openMovieAction = new OpenMovieAction();
 		playAction = new PlayAction();
 		pauseAction = new PauseAction();
@@ -75,10 +72,8 @@ public class MovieController extends AbstractController<MovieModule> implements
 		fastForwardAction.setEnabled(false);
 		positionAction.setEnabled(false);
 
-		this.parent = parent;
-
-		fileChooser = new FileChooser(FileType.MOVIE_FILE, "movie");
-	}
+                fileChooser = new FileChooser(FileType.MOVIE_FILE, "movie");
+        }
 
 	/**
 	 * Opens the file chooser dialog to select a movie file.
@@ -122,13 +117,14 @@ public class MovieController extends AbstractController<MovieModule> implements
 						.getCurrentExperiment();
 				experiment.setName(FileType.removeExtension(fileName));
 				Tree.getManager().setRoot(experiment);
-				JOptionPane.showMessageDialog(parent,
-						"Movie loaded successfully: " + fileName);
-			} catch (Exception e) {
-				JOptionPane.showMessageDialog(parent, "Error loading movie!");
-				e.printStackTrace();
-			}
-		}
+                                JOptionPane.showMessageDialog(FileChooser.getParent(),
+                                                "Movie loaded successfully: " + fileName);
+                        } catch (Exception e) {
+                                JOptionPane.showMessageDialog(FileChooser.getParent(),
+                                                "Error loading movie!");
+                                e.printStackTrace();
+                        }
+                }
 
 	}
 
