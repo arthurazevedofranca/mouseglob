@@ -30,9 +30,13 @@ public class FileChooser {
 
 	private JFileChooser chooser;
 
-	public static void setParent(Component parent) {
-		FileChooser.parent = parent;
-	}
+        public static void setParent(Component parent) {
+                FileChooser.parent = parent;
+        }
+
+        public static Component getParent() {
+                return parent;
+        }
 
 	public FileChooser(FileType fileType, String name) {
 		this.fileType = fileType;
