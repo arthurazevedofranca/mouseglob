@@ -271,13 +271,28 @@ docker run -it mouseglob
 
 ### Gerando Executável Windows (.exe)
 
-O projeto suporta geração de instalador nativo Windows que **não requer Java instalado** no sistema do usuário:
+O projeto suporta geração de instalador nativo Windows que **não requer Java instalado** no sistema do usuário.
 
-#### Passo 1: Instalar WiX Toolset (apenas na primeira vez)
+**⚠️ IMPORTANTE:** O jpackage só gera instaladores nativos para o SO em que está rodando. Para gerar `.exe`/`.msi` para Windows, você precisa rodar em uma máquina Windows.
+
+#### Opção A: Gerar automaticamente via GitHub Actions (Recomendado - funciona de qualquer OS)
+
+1. Faça push do código para o GitHub
+2. Vá em: **Actions** → **Build Windows Executable** → **Run workflow**
+3. Aguarde ~5-10 minutos
+4. Baixe os arquivos gerados em **Artifacts**:
+   - `MouseGlob-Windows-Installer.zip` (contém o `.msi`)
+   - `MouseGlob-Windows-Standalone.zip` (contém o `.exe`)
+
+**Você pode fazer isso do Mac, Linux ou qualquer lugar!**
+
+#### Opção B: Gerar localmente em uma máquina Windows
+
+**Passo 1:** Instalar WiX Toolset (apenas na primeira vez)
 1. Baixe o [WiX Toolset v3.x](https://github.com/wixtoolset/wix3/releases)
 2. Instale e adicione ao PATH do sistema
 
-#### Passo 2: Gerar o instalador
+**Passo 2:** Gerar o instalador
 ```cmd
 REM Opção 1: Usar script automatizado
 build-windows-exe.bat
