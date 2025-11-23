@@ -2,6 +2,7 @@ import org.gradle.api.file.RelativePath
 
 plugins {
     id 'application'
+    id 'org.beryx.runtime' version '1.13.1'
 }
 
 application {
@@ -101,5 +102,27 @@ tasks.withType(Jar).configureEach {
         attributes(
             'Main-Class': application.mainClass
         )
+    }
+}
+
+// Configuration for jpackage to create native installers
+runtime {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    modules = ['java.desktop', 'java.logging', 'java.xml', 'java.naming', 'java.sql', 'jdk.unsupported']
+
+    jpackage {
+        imageName = 'MouseGlob'
+        installerName = 'MouseGlob'
+        appVersion = project.version.toString().replaceAll('-SNAPSHOT', '')
+
+        // Windows-specific configuration
+        installerOptions = [
+            '--win-dir-chooser',
+            '--win-menu',
+            '--win-shortcut'
+        ]
+
+        // Optional: Add icon (if you have one)
+        // imageOptions = ['--icon', 'src/main/resources/mouseglob.ico']
     }
 }

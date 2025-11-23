@@ -227,7 +227,8 @@ public class MouseGlob extends
 			if (!vr.ok) {
 				log.error("Dependency graph validation failed. See report above.");
 				dcc.mouseglob.ui.ErrorDialog.showError("Erro de Injeção de Dependências",
-					"Falha na validação das dependências.\nCorrija ciclos ou bindings ausentes e reinicie.\n\nVeja logs em ~/.mouseglob/logs.");
+					"Falha na validação das dependências.\nCorrija ciclos ou bindings ausentes e reinicie.\n\nVeja logs em " +
+				java.nio.file.Paths.get(System.getProperty("user.home"), ".mouseglob", "logs").toString() + ".");
 				return;
 			}
 		} catch (Throwable t) {

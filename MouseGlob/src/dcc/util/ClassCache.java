@@ -82,8 +82,8 @@ public class ClassCache {
 
 		private Set<Class<?>> load() {
 			String projectRoot = System.getProperty("user.dir");
-			File bin = new File(projectRoot + "/bin");
-			File ext = new File(projectRoot + "/ext");
+			File bin = new File(projectRoot, "bin");
+			File ext = new File(projectRoot, "ext");
 
 			if (bin.exists())
 				loadFrom(bin, true);

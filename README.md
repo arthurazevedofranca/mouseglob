@@ -9,29 +9,48 @@ Os artefatos antigos do Eclipse/Ant (build.xml, .iml, etc.) foram mantidos apena
 
 ## Pré-requisitos
 - JDK 21 instalado (JAVA_HOME apontando para o JDK 21)
-- Gradle 8.x instalado (ou use o wrapper do projeto: ./gradlew)
+- Gradle 8.x instalado (ou use o wrapper do projeto: `./gradlew` no Linux/Mac ou `gradlew.bat` no Windows)
 
 ## Compilar
 
+### Linux / macOS
 ```bash
 # Na raiz do repositório
 ./gradlew build
 ```
 
+### Windows
+```cmd
+REM Na raiz do repositório
+gradlew.bat build
+```
+
 ## Executar
 
+### Linux / macOS
 ```bash
 # Executa a aplicação principal
 ./gradlew :MouseGlob:run
 ```
 
+### Windows
+```cmd
+REM Executa a aplicação principal
+gradlew.bat :MouseGlob:run
+```
+
 Também é possível gerar uma distribuição com scripts de inicialização:
 
+### Linux / macOS
 ```bash
 ./gradlew :MouseGlob:installDist
-# Scripts ficarão em MouseGlob/build/install/MouseGlob/bin/
-# macOS/Linux: MouseGlob/build/install/MouseGlob/bin/MouseGlob
-# Windows: MouseGlob/build/install/MouseGlob/bin/MouseGlob.bat
+# Scripts ficarão em MouseGlob/build/install/MouseGlob/bin/MouseGlob
+```
+
+### Windows
+```cmd
+gradlew.bat :MouseGlob:installDist
+REM Scripts ficarão em MouseGlob\build\install\MouseGlob\bin\MouseGlob.bat
 ```
 
 ## Estrutura
@@ -65,29 +84,48 @@ Os artefatos antigos do Eclipse/Ant (build.xml, .iml, etc.) foram mantidos apena
 
 ## Pré-requisitos
 - JDK 21 instalado (JAVA_HOME apontando para o JDK 21)
-- Gradle 8.x instalado (ou use o wrapper do projeto: ./gradlew)
+- Gradle 8.x instalado (ou use o wrapper do projeto: `./gradlew` no Linux/Mac ou `gradlew.bat` no Windows)
 
 ## Compilar
 
+### Linux / macOS
 ```bash
 # Na raiz do repositório
 ./gradlew build
 ```
 
+### Windows
+```cmd
+REM Na raiz do repositório
+gradlew.bat build
+```
+
 ## Executar
 
+### Linux / macOS
 ```bash
 # Executa a aplicação principal
 ./gradlew :MouseGlob:run
 ```
 
+### Windows
+```cmd
+REM Executa a aplicação principal
+gradlew.bat :MouseGlob:run
+```
+
 Também é possível gerar uma distribuição com scripts de inicialização:
 
+### Linux / macOS
 ```bash
 ./gradlew :MouseGlob:installDist
-# Scripts ficarão em MouseGlob/build/install/MouseGlob/bin/
-# macOS/Linux: MouseGlob/build/install/MouseGlob/bin/MouseGlob
-# Windows: MouseGlob/build/install/MouseGlob/bin/MouseGlob.bat
+# Scripts ficarão em MouseGlob/build/install/MouseGlob/bin/MouseGlob
+```
+
+### Windows
+```cmd
+gradlew.bat :MouseGlob:installDist
+REM Scripts ficarão em MouseGlob\build\install\MouseGlob\bin\MouseGlob.bat
 ```
 
 ## Estrutura
@@ -163,3 +201,124 @@ Se a pipeline estiver ativa, o `TrackingManager` usa o resultado (`mask`) da pip
   2) Registre o provider adicionando o arquivo de recursos `META-INF/services/dcc.mouseglob.analysis.spi.AnalysisProvider` contendo o FQN da sua classe provider.
   3) Opcional: anote suas classes de `Analysis` com `@AnalysisInfo` para nome/descrição na UI.
 - O projeto inclui um provider padrão (`dcc.mouseglob.analysis.spi.DefaultAnalysesProvider`) para as análises internas. Se nenhum provider for encontrado no classpath, há fallback para a descoberta antiga por varredura de classes.
+
+## Compatibilidade com Windows
+
+O projeto foi atualizado para suportar totalmente o Windows. As seguintes alterações foram implementadas:
+
+### Correções de Compatibilidade
+- ✅ Caminhos de arquivos agora usam APIs multiplataforma (`File(parent, child)` ou `Path.resolve()`)
+- ✅ Mensagens de erro usam caminhos dinâmicos baseados em `System.getProperty("user.home")`
+- ✅ Gradle wrapper (`gradlew.bat`) incluído para builds no Windows
+- ✅ Scripts de distribuição `.bat` gerados automaticamente pelo Gradle
+
+### Testando no Windows
+
+#### Opção 1: Windows Nativo
+1. Instale o [JDK 21 para Windows](https://adoptium.net/)
+2. Configure a variável de ambiente `JAVA_HOME` apontando para o JDK 21
+3. Clone o repositório
+4. Execute: `gradlew.bat build`
+5. Execute: `gradlew.bat :MouseGlob:run`
+
+#### Opção 2: WSL (Windows Subsystem for Linux)
+WSL permite executar um ambiente Linux dentro do Windows:
+
+```powershell
+# No PowerShell (como administrador)
+wsl --install
+```
+
+Após reiniciar, no terminal WSL:
+```bash
+# Instalar JDK 21
+sudo apt update
+sudo apt install openjdk-21-jdk
+
+# Clonar e executar o projeto
+git clone <url-do-repositorio>
+cd mouseglob
+./gradlew build
+./gradlew :MouseGlob:run
+```
+
+#### Opção 3: Docker no Windows
+Use Docker Desktop para Windows:
+
+```dockerfile
+# Criar arquivo Dockerfile
+FROM eclipse-temurin:21-jdk
+
+WORKDIR /app
+COPY . .
+
+RUN ./gradlew build
+
+CMD ["./gradlew", ":MouseGlob:run"]
+```
+
+```powershell
+# Build e execução
+docker build -t mouseglob .
+docker run -it mouseglob
+```
+
+### Observações para Windows
+- Os caminhos de configuração ficam em `%USERPROFILE%\.mouseglob\`
+- Logs ficam em `%USERPROFILE%\.mouseglob\logs\`
+- Use `\` (barra invertida) ou `/` (barra) nos caminhos - Java aceita ambos no Windows
+- Para GUI, certifique-se de ter suporte a X11 (necessário no WSL/Docker)
+
+### Gerando Executável Windows (.exe)
+
+O projeto suporta geração de instalador nativo Windows que **não requer Java instalado** no sistema do usuário.
+
+**⚠️ IMPORTANTE:** O jpackage só gera instaladores nativos para o SO em que está rodando. Para gerar `.exe`/`.msi` para Windows, você precisa rodar em uma máquina Windows.
+
+#### Opção A: Gerar automaticamente via GitHub Actions (Recomendado - funciona de qualquer OS)
+
+1. Faça push do código para o GitHub
+2. Vá em: **Actions** → **Build Windows Executable** → **Run workflow**
+3. Aguarde ~5-10 minutos
+4. Baixe os arquivos gerados em **Artifacts**:
+   - `MouseGlob-Windows-Installer.zip` (contém o `.msi`)
+   - `MouseGlob-Windows-Standalone.zip` (contém o `.exe`)
+
+**Você pode fazer isso do Mac, Linux ou qualquer lugar!**
+
+#### Opção B: Gerar localmente em uma máquina Windows
+
+**Passo 1:** Instalar WiX Toolset (apenas na primeira vez)
+1. Baixe o [WiX Toolset v3.x](https://github.com/wixtoolset/wix3/releases)
+2. Instale e adicione ao PATH do sistema
+
+**Passo 2:** Gerar o instalador
+```cmd
+REM Opção 1: Usar script automatizado
+build-windows-exe.bat
+
+REM Opção 2: Comando manual
+gradlew.bat jpackage
+```
+
+#### O que é gerado:
+- **Instalador MSI**: `MouseGlob\build\jpackage\MouseGlob-2.0.1.msi`
+  - Instala a aplicação no sistema
+  - Cria atalho no menu iniciar
+  - Inclui JRE embutido (não precisa de Java instalado)
+  - ~200-300 MB (inclui todas as dependências)
+
+- **Imagem standalone**: `MouseGlob\build\jpackage\MouseGlob\bin\MouseGlob.exe`
+  - Executável direto sem instalação
+  - Pode ser copiado para outro computador Windows
+  - Também inclui JRE embutido
+
+#### Distribuindo para outros usuários:
+1. Compartilhe o arquivo `.msi`
+2. Usuário executa o `.msi` e instala normalmente
+3. Aplicação aparece no Menu Iniciar
+4. **Não é necessário ter Java instalado!**
+
+#### Tamanho do instalador:
+- Com JRE embutido: ~250-350 MB
+- Sem JRE (requer Java no sistema): adicione `--no-runtime` nas `installerOptions`

@@ -1,0 +1,54 @@
+name: Build Windows Executable
+
+on:
+  workflow_dispatch:  # Permite rodar manualmente
+  push:
+    branches:
+      - main  # Roda automaticamente em todo push na main
+      - master  # Caso use master ao invés de main
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup JDK 21
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.5'
+
+    - name: Setup WiX Toolset
+      run: |
+        choco install wixtoolset -y
+        echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+    - name: Build with Gradle (skip tests)
+      run: gradle build -x test
+
+    - name: Generate Windows installer
+      run: gradle jpackage
+
+    - name: Upload MSI installer
+      uses: actions/upload-artifact@v4
+      with:
+        name: MouseGlob-Windows-Installer
+        path: MouseGlob/build/jpackage/*.msi
+
+    - name: Upload standalone executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: MouseGlob-Windows-Standalone
+        path: MouseGlob/build/jpackage/MouseGlob/
