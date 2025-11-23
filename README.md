@@ -268,3 +268,42 @@ docker run -it mouseglob
 - Logs ficam em `%USERPROFILE%\.mouseglob\logs\`
 - Use `\` (barra invertida) ou `/` (barra) nos caminhos - Java aceita ambos no Windows
 - Para GUI, certifique-se de ter suporte a X11 (necessário no WSL/Docker)
+
+### Gerando Executável Windows (.exe)
+
+O projeto suporta geração de instalador nativo Windows que **não requer Java instalado** no sistema do usuário:
+
+#### Passo 1: Instalar WiX Toolset (apenas na primeira vez)
+1. Baixe o [WiX Toolset v3.x](https://github.com/wixtoolset/wix3/releases)
+2. Instale e adicione ao PATH do sistema
+
+#### Passo 2: Gerar o instalador
+```cmd
+REM Opção 1: Usar script automatizado
+build-windows-exe.bat
+
+REM Opção 2: Comando manual
+gradlew.bat jpackage
+```
+
+#### O que é gerado:
+- **Instalador MSI**: `MouseGlob\build\jpackage\MouseGlob-2.0.1.msi`
+  - Instala a aplicação no sistema
+  - Cria atalho no menu iniciar
+  - Inclui JRE embutido (não precisa de Java instalado)
+  - ~200-300 MB (inclui todas as dependências)
+
+- **Imagem standalone**: `MouseGlob\build\jpackage\MouseGlob\bin\MouseGlob.exe`
+  - Executável direto sem instalação
+  - Pode ser copiado para outro computador Windows
+  - Também inclui JRE embutido
+
+#### Distribuindo para outros usuários:
+1. Compartilhe o arquivo `.msi`
+2. Usuário executa o `.msi` e instala normalmente
+3. Aplicação aparece no Menu Iniciar
+4. **Não é necessário ter Java instalado!**
+
+#### Tamanho do instalador:
+- Com JRE embutido: ~250-350 MB
+- Sem JRE (requer Java no sistema): adicione `--no-runtime` nas `installerOptions`
