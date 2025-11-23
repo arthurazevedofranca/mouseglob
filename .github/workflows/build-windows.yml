@@ -3,8 +3,13 @@ name: Build Windows Executable
 on:
   workflow_dispatch:  # Permite rodar manualmente
   push:
-    tags:
-      - 'v*'  # Roda automaticamente em tags de versão (v1.0.0, v2.0.1, etc)
+    branches:
+      - main  # Roda automaticamente em todo push na main
+      - master  # Caso use master ao invés de main
+  pull_request:
+    branches:
+      - main
+      - master
 
 jobs:
   build-windows:
