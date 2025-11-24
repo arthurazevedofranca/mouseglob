@@ -4,7 +4,7 @@
 
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://adoptium.net/)
 [![Gradle](https://img.shields.io/badge/Gradle-8.5+-blue.svg)](https://gradle.org/)
-[![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](license.txt)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 ## 📋 Índice
 
@@ -442,16 +442,22 @@ Veja [CLAUDE.md](CLAUDE.md) para guia detalhado de desenvolvimento.
 
 ## 📄 Licença
 
-Este projeto é distribuído sob a licença GNU General Public License v3.0. Veja [license.txt](license.txt) para o texto completo da licença.
+Este projeto é distribuído sob a **Apache License 2.0**. Veja [LICENSE](LICENSE) para o texto completo da licença.
 
-**Resumo da GPLv3:**
-- ✅ Uso comercial permitido
-- ✅ Modificação permitida
-- ✅ Distribuição permitida
-- ✅ Uso de patentes permitido
-- ⚠️ Modificações devem ser disponibilizadas sob a mesma licença (copyleft)
-- ⚠️ Código-fonte deve ser disponibilizado
-- ⚠️ Mudanças devem ser documentadas
+**Por que Apache 2.0?**
+Esta licença foi escolhida para maximizar a adoção científica e colaboração, permitindo uso em contextos acadêmicos, comerciais e industriais sem barreiras legais.
+
+**Resumo da Apache 2.0:**
+- ✅ **Uso comercial**: Use livremente em produtos comerciais
+- ✅ **Modificação**: Altere o código conforme necessário
+- ✅ **Distribuição**: Compartilhe o software original ou modificado
+- ✅ **Uso de patentes**: Proteção contra litígios de patentes
+- ✅ **Uso privado**: Use e modifique internamente sem obrigação de compartilhar
+- ⚠️ **Aviso de mudanças**: Documente arquivos modificados
+- ⚠️ **Manter licença e avisos**: Inclua LICENSE e NOTICE em distribuições
+- ⚠️ **Sem uso de marca**: Não use "MouseGlob" como marca sem permissão
+
+**Compatibilidade**: Apache 2.0 é compatível com GPLv3, MIT, BSD e a maioria das licenças open source.
 
 ## 🙏 Agradecimentos
 

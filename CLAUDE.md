@@ -1805,4 +1805,4 @@ Para questões técnicas, bugs ou contribuições:
 
 **Última atualização**: 2025-11-24
 **Mantenedores**: [Lista de mantenedores]
-**Licença**: GNU General Public License v3.0 (GPLv3) - veja [license.txt](license.txt)
+**Licença**: Apache License 2.0 - veja [LICENSE](LICENSE) e [NOTICE](NOTICE)

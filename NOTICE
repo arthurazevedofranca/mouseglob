@@ -1,0 +1,35 @@
+MouseGlob
+Copyright 2025 MouseGlob Contributors
+
+This product includes software developed by the MouseGlob project
+(https://github.com/arthurazevedofranca/mouseglob).
+
+This software includes third-party libraries with their own licenses:
+
+- Processing Core (LGPL/GPL)
+  https://processing.org/
+  Copyright (c) Processing Foundation
+
+- JavaCV (Apache License 2.0 / GPLv2)
+  https://github.com/bytedeco/javacv
+  Copyright (C) 2009-2024 Samuel Audet
+
+- FlatLaf (Apache License 2.0)
+  https://www.formdev.com/flatlaf/
+  Copyright 2019 FormDev Software GmbH
+
+- Jackson (Apache License 2.0)
+  https://github.com/FasterXML/jackson
+  Copyright (c) 2007- Tatu Saloranta and contributors
+
+- SLF4J (MIT License)
+  https://www.slf4j.org/
+  Copyright (c) 2004-2023 QOS.ch
+
+- Logback (EPL v1.0 / LGPL 2.1)
+  https://logback.qos.ch/
+  Copyright (C) 1999-2015, QOS.ch
+
+- Apache Commons CSV (Apache License 2.0)
+  https://commons.apache.org/proper/commons-csv/
+  Copyright 2005-2024 The Apache Software Foundation
