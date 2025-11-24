@@ -1,324 +1,503 @@
-# MouseGlob (Atualizado para Java 21)
+# MouseGlob
 
-Este repositório foi atualizado para compilar e executar com Java 21, sem dependências do Eclipse. Foi adicionado um build Gradle multi-módulo para os projetos:
+**Plataforma multiplataforma para análise comportamental de roedores em vídeo**
 
-- Injection (biblioteca interna)
-- MouseGlob (aplicação principal)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://adoptium.net/)
+[![Gradle](https://img.shields.io/badge/Gradle-8.5+-blue.svg)](https://gradle.org/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-Os artefatos antigos do Eclipse/Ant (build.xml, .iml, etc.) foram mantidos apenas para referência, mas não são mais necessários no build.
+## 📋 Índice
 
-## Pré-requisitos
-- JDK 21 instalado (JAVA_HOME apontando para o JDK 21)
-- Gradle 8.x instalado (ou use o wrapper do projeto: `./gradlew` no Linux/Mac ou `gradlew.bat` no Windows)
+- [Visão Geral](#-visão-geral)
+- [Propósito e Responsabilidades](#-propósito-e-responsabilidades)
+- [Funcionalidades Principais](#-funcionalidades-principais)
+- [Público-Alvo](#-público-alvo)
+- [Casos de Uso](#-casos-de-uso)
+- [Instalação e Execução](#-instalação-e-execução)
+- [Guia Rápido](#-guia-rápido)
+- [Arquitetura](#-arquitetura)
+- [Contribuição](#-contribuição)
+- [Documentação Técnica](#-documentação-técnica)
 
-## Compilar
+## 🎯 Visão Geral
 
-### Linux / macOS
-```bash
-# Na raiz do repositório
-./gradlew build
-```
+**MouseGlob** é uma aplicação científica especializada em **análise automatizada de comportamento animal em vídeos**, desenvolvida para pesquisadores em neurociência, farmacologia e etologia. A ferramenta permite rastrear, quantificar e analisar o comportamento de roedores em ambientes controlados (labirintos, arenas abertas, etc.) com precisão e reprodutibilidade.
 
-### Windows
-```cmd
-REM Na raiz do repositório
-gradlew.bat build
-```
+### Por que MouseGlob?
 
-## Executar
+- **Automação completa**: Elimina a necessidade de análise manual frame a frame
+- **Reprodutibilidade**: Análises consistentes e auditáveis via configurações exportáveis
+- **Extensibilidade**: Sistema de plugins permite criar análises customizadas
+- **Open Source**: Código aberto, transparente e auditável pela comunidade científica
+- **Multiplataforma**: Funciona em Windows, Linux e macOS
 
-### Linux / macOS
-```bash
-# Executa a aplicação principal
-./gradlew :MouseGlob:run
-```
+## 🎓 Propósito e Responsabilidades
 
-### Windows
-```cmd
-REM Executa a aplicação principal
-gradlew.bat :MouseGlob:run
-```
+### Propósito
 
-Também é possível gerar uma distribuição com scripts de inicialização:
+MouseGlob foi criado para **democratizar o acesso a ferramentas de análise comportamental computadorizada**, oferecendo uma alternativa open-source a softwares comerciais caros. O projeto visa:
 
-### Linux / macOS
-```bash
-./gradlew :MouseGlob:installDist
-# Scripts ficarão em MouseGlob/build/install/MouseGlob/bin/MouseGlob
-```
+1. **Facilitar a pesquisa científica** em comportamento animal com ferramentas robustas e acessíveis
+2. **Garantir reprodutibilidade** através de pipelines de processamento configuráveis e auditáveis
+3. **Reduzir viés humano** na análise comportamental através de automação
+4. **Promover colaboração** científica com formatos de dados abertos e interoperáveis
 
-### Windows
-```cmd
-gradlew.bat :MouseGlob:installDist
-REM Scripts ficarão em MouseGlob\build\install\MouseGlob\bin\MouseGlob.bat
-```
+### Responsabilidades
 
-## Estrutura
-- settings.gradle: define os módulos Injection e MouseGlob
-- build.gradle (raiz): configura Java 21 via toolchain
-- Injection/build.gradle: configura a biblioteca Injection usando o diretório de código legado `Injection/src`
-- MouseGlob/build.gradle: configura a aplicação principal usando `MouseGlob/src` e `MouseGlob/src/resource` e dependências do Maven Central
+A aplicação é responsável por:
 
-## Dependências (Maven Central)
-- processing core: org.processing:core:3.3.7
-- JavaCV (FFmpeg/OpenCV): org.bytedeco:javacv-platform:1.5.10
+#### 1. Captura e Reprodução de Vídeo
+- Abrir arquivos de vídeo em múltiplos formatos (via FFmpeg)
+- Capturar vídeo de câmeras em tempo real (via OpenCV)
+- Controlar reprodução (play, pause, velocidade, navegação frame a frame)
+- Gerenciar sincronização temporal para análises precisas
 
-As dependências locais (Processing video, gstreamer-java, jna, jlfgr) foram removidas do classpath ativo e substituídas por dependências publicadas, reduzindo atrito e melhorando a reprodutibilidade.
+#### 2. Calibração Espacial
+- Converter pixels em unidades reais (cm, mm)
+- Permitir calibração visual interativa
+- Armazenar e recuperar calibrações para reuso
 
-## Stack de vídeo
-- Reprodução de vídeos via FFmpeg (JavaCV/FFmpegFrameGrabber).
-- Câmera reativada usando OpenCV (JavaCV/OpenCVFrameGrabber), com fila limitada e descarte de frames para evitar stutter. Por padrão, o dispositivo 0 é aberto em 640x480. É possível sondar dispositivos com `CameraManager.probeDevices()` e iniciar com índice e resolução específicos via `CameraManager.start(applet, deviceIndex, width, height)`.
+#### 3. Definição de Ambiente Experimental
+- Desenhar limites da arena/labirinto (boundaries)
+- Definir zonas de interesse nomeadas (ex: braço esquerdo, centro, periferia)
+- Detectar eventos de entrada/saída de zonas
 
-## Observações
-- Alguns arquivos de exemplo/teste antigos (CompareApplet.java, HoughTest.java, OtsuTest.java, ForkJoinTest.java) foram excluídos da compilação por padrão para evitar conflitos com o JDK 21. Isso não afeta a aplicação principal `dcc.mouseglob.MouseGlob`.
-- Se necessário, você pode reabilitar esses arquivos removendo as entradas `exclude` em `MouseGlob/build.gradle`.
+#### 4. Rastreamento de Objetos
+- Rastrear múltiplos pontos do animal (cabeça, corpo, cauda)
+- Pipeline modular de processamento de imagem:
+  - Conversão para escala de cinza
+  - Subtração de fundo (background subtraction)
+  - Limiarização adaptativa
+  - Operações morfológicas (erosão, dilatação)
+- Gerar trajetórias temporais com coordenadas XY
 
-# MouseGlob (Atualizado para Java 21)
+#### 5. Análises Comportamentais
+Sistema extensível com 23+ análises pré-implementadas:
+- **Espaciais**: posição, distância percorrida, mapa de calor
+- **Cinéticas**: velocidade, aceleração, paradas
+- **Angulares**: orientação, mudanças de direção, rotações
+- **Cognitivas**: alternação espontânea, tempo em zonas
 
-Este repositório foi atualizado para compilar e executar com Java 21, sem dependências do Eclipse. Foi adicionado um build Gradle multi-módulo para os projetos:
+#### 6. Geração de Relatórios
+- Gráficos interativos em tempo real
+- Exportação de dados em múltiplos formatos:
+  - **CSV**: para análise estatística (R, Python, SPSS)
+  - **NDJSON**: formato estruturado para processamento automatizado
+  - **SVG/PNG**: gráficos vetoriais e rasterizados
+- Mapas de calor e visualizações espaciais
 
-- Injection (biblioteca interna)
-- MouseGlob (aplicação principal)
+#### 7. Persistência e Reprodutibilidade
+- Salvar experimentos completos (vídeo + configurações + análises)
+- Exportar/importar configurações de pipeline
+- Garantir auditabilidade através de metadados detalhados
 
-Os artefatos antigos do Eclipse/Ant (build.xml, .iml, etc.) foram mantidos apenas para referência, mas não são mais necessários no build.
+## ✨ Funcionalidades Principais
 
-## Pré-requisitos
-- JDK 21 instalado (JAVA_HOME apontando para o JDK 21)
-- Gradle 8.x instalado (ou use o wrapper do projeto: `./gradlew` no Linux/Mac ou `gradlew.bat` no Windows)
+### Interface Gráfica Intuitiva
+- Visualização em tempo real do vídeo com sobreposições (zonas, trajetórias)
+- Controles de reprodução completos
+- Painéis modulares para cada funcionalidade
+- Árvore hierárquica de componentes do experimento
 
-## Compilar
-
-### Linux / macOS
-```bash
-# Na raiz do repositório
-./gradlew build
-```
-
-### Windows
-```cmd
-REM Na raiz do repositório
-gradlew.bat build
-```
-
-## Executar
-
-### Linux / macOS
-```bash
-# Executa a aplicação principal
-./gradlew :MouseGlob:run
-```
-
-### Windows
-```cmd
-REM Executa a aplicação principal
-gradlew.bat :MouseGlob:run
-```
-
-Também é possível gerar uma distribuição com scripts de inicialização:
-
-### Linux / macOS
-```bash
-./gradlew :MouseGlob:installDist
-# Scripts ficarão em MouseGlob/build/install/MouseGlob/bin/MouseGlob
-```
-
-### Windows
-```cmd
-gradlew.bat :MouseGlob:installDist
-REM Scripts ficarão em MouseGlob\build\install\MouseGlob\bin\MouseGlob.bat
-```
-
-## Estrutura
-- settings.gradle: define os módulos Injection e MouseGlob
-- build.gradle (raiz): configura Java 21 via toolchain
-- Injection/build.gradle: configura a biblioteca Injection usando o diretório de código legado `Injection/src`
-- MouseGlob/build.gradle: configura a aplicação principal usando `MouseGlob/src` e `MouseGlob/src/resource` e dependências do Maven Central
-
-## Dependências (Maven Central)
-- processing core: org.processing:core:3.3.7
-- JavaCV (FFmpeg/OpenCV): org.bytedeco:javacv-platform:1.5.10
-
-As dependências locais (Processing video, gstreamer-java, jna, jlfgr) foram removidas do classpath ativo e substituídas por dependências publicadas, reduzindo atrito e melhorando a reprodutibilidade.
-
-## Stack de vídeo
-- Reprodução de vídeos via FFmpeg (JavaCV/FFmpegFrameGrabber).
-- Câmera reativada usando OpenCV (JavaCV/OpenCVFrameGrabber), com fila limitada e descarte de frames para evitar stutter. Por padrão, o dispositivo 0 é aberto em 640x480. É possível sondar dispositivos com `CameraManager.probeDevices()` e iniciar com índice e resolução específicos via `CameraManager.start(applet, deviceIndex, width, height)`.
-
-## Pipeline de rastreamento (novo)
-- Foi introduzida uma camada modular de processamento de frames em `dcc.mouseglob.tracking.pipeline`, com estágios encadeáveis:
-  - GrayscaleStage: conversão para escala de cinza.
-  - BackgroundSubtractStage: subtração de fundo com média móvel exponencial (alpha configurável) ou modo estático.
-  - AdaptiveThresholdStage: limiarização global ou adaptativa (média local + constante C), com suporte a objetos claros/escuros.
-  - MorphologyStage: operações morfológicas (open/close/erode/dilate) com kernel 3x3/5x5/7x7.
-- A configuração é feita por JSON (ex.: `MouseGlob/src/resource/pipelines/default.json`). Exemplo:
+### Pipeline de Processamento Configurável
+Configure o processamento de imagem via JSON sem recompilar:
 
 ```json
 {
   "stages": [
     { "type": "grayscale" },
     { "type": "background", "mode": "running", "alpha": 0.02 },
-    { "type": "adaptiveThreshold", "mode": "adaptiveMean", "dark": false, "blockSize": 15, "c": 5 },
+    { "type": "adaptiveThreshold", "mode": "adaptiveMean", "blockSize": 15, "c": 5 },
     { "type": "morphology", "operation": "open", "kernel": "3x3" }
   ]
 }
 ```
 
-- Propriedades (PropertiesManager):
-  - `tracking.pipeline.enabled` (default: `true`)
-  - `tracking.pipeline.file` (default: `/resource/pipelines/default.json`)
+### Sistema de Plugins
+Crie análises customizadas implementando a interface `Analysis` e registrando via `ServiceLoader`:
 
-Se a pipeline estiver ativa, o `TrackingManager` usa o resultado (`mask`) da pipeline; caso contrário, mantém o caminho legado (cinza → diferença opcional → threshold fixo claro/escuro).
-
-## Persistência e formatos (novo)
-- JSON + JSON Schema:
-  - Adicionados esquemas JSON em `MouseGlob/src/resource/schemas/`:
-    - `trajectory.schema.json`: NDJSON para exportar trajetórias (1º objeto é metadados, depois 1 linha por frame/medida).
-    - `experiment.schema.json`: metadados básicos de experimento (arquivo de vídeo, trajetórias, calibração, etc.).
-  - Utilitário de exportação de trajetórias para NDJSON: `dcc.mouseglob.trajectory.TrajectoriesJSON.exportNdjson(...)`.
-- Relatórios em CSV/SVG:
-  - NOVO menu no relatório (botão direito): "Export CSV..." para salvar as séries do gráfico em CSV; "Save As SVG..." para exportar em SVG (usa PNG embutido para compatibilidade).
-  - Implementação em `dcc.mouseglob.report.ReportExportUtil` e `dcc.mouseglob.report.AppletReport`.
-- Parquet: planejado. A exportação foi prototipada, mas removida do build por exigir dependências Hadoop pesadas. Pode ser habilitada futuramente.
-
-## Testes de processamento/tracking
-- Foi adicionado um smoke test simples em `MouseGlob/src/test/java/dcc/mouseglob/tracking/pipeline/PipelineTests.java` (sem dependências externas), que gera frames sintéticos com ruído, variação de iluminação e oclusão parcial para validar a robustez da pipeline. 
-- Para executar manualmente:
-
-```bash
-# Executa a classe de teste (ex.: via Gradle Application ou sua IDE)
-# Classe: dcc.mouseglob.tracking.pipeline.PipelineTests (método main)
+```java
+@AnalysisInfo(
+    name = "Minha Análise",
+    description = "Descrição da análise customizada"
+)
+public class MinhaAnalise extends AbstractAnalysis {
+    // Implementação
+}
 ```
 
-## Observações
-- Alguns arquivos de exemplo/teste antigos (CompareApplet.java, HoughTest.java, OtsuTest.java, ForkJoinTest.java) foram excluídos da compilação por padrão para evitar conflitos com o JDK 21. Isso não afeta a aplicação principal `dcc.mouseglob.MouseGlob`.
-- Se necessário, você pode reabilitar esses arquivos removendo as entradas `exclude` em `MouseGlob/build.gradle`.
+### Modo CLI (Headless)
+Processe vídeos sem interface gráfica:
 
+```bash
+# Processar um vídeo e exportar para CSV
+./gradlew :MouseGlob:runCli -- --input video.mp4 --output results.csv
 
-## Plugins de Análises (ServiceLoader)
-- As análises (implementações de `dcc.mouseglob.analysis.Analysis`) agora podem ser descobertas por `ServiceLoader` via o SPI `dcc.mouseglob.analysis.spi.AnalysisProvider`.
-- Como usar em um plugin externo:
-  1) Crie uma classe que implemente `AnalysisProvider` e retorne as classes de `Analysis` fornecidas pelo seu plugin.
-  2) Registre o provider adicionando o arquivo de recursos `META-INF/services/dcc.mouseglob.analysis.spi.AnalysisProvider` contendo o FQN da sua classe provider.
-  3) Opcional: anote suas classes de `Analysis` com `@AnalysisInfo` para nome/descrição na UI.
-- O projeto inclui um provider padrão (`dcc.mouseglob.analysis.spi.DefaultAnalysesProvider`) para as análises internas. Se nenhum provider for encontrado no classpath, há fallback para a descoberta antiga por varredura de classes.
+# Exportar para NDJSON
+./gradlew :MouseGlob:runCli -- --input video.mp4 --output trajectory.ndjson --ndjson
 
-## Compatibilidade com Windows
-
-O projeto foi atualizado para suportar totalmente o Windows. As seguintes alterações foram implementadas:
-
-### Correções de Compatibilidade
-- ✅ Caminhos de arquivos agora usam APIs multiplataforma (`File(parent, child)` ou `Path.resolve()`)
-- ✅ Mensagens de erro usam caminhos dinâmicos baseados em `System.getProperty("user.home")`
-- ✅ Gradle wrapper (`gradlew.bat`) incluído para builds no Windows
-- ✅ Scripts de distribuição `.bat` gerados automaticamente pelo Gradle
-
-### Testando no Windows
-
-#### Opção 1: Windows Nativo
-1. Instale o [JDK 21 para Windows](https://adoptium.net/)
-2. Configure a variável de ambiente `JAVA_HOME` apontando para o JDK 21
-3. Clone o repositório
-4. Execute: `gradlew.bat build`
-5. Execute: `gradlew.bat :MouseGlob:run`
-
-#### Opção 2: WSL (Windows Subsystem for Linux)
-WSL permite executar um ambiente Linux dentro do Windows:
-
-```powershell
-# No PowerShell (como administrador)
-wsl --install
+# Com pipeline customizado
+./gradlew :MouseGlob:runCli -- --input video.mp4 --output results.csv --pipeline custom-pipeline.json
 ```
 
-Após reiniciar, no terminal WSL:
-```bash
-# Instalar JDK 21
-sudo apt update
-sudo apt install openjdk-21-jdk
+## 👥 Público-Alvo
 
-# Clonar e executar o projeto
-git clone <url-do-repositorio>
+### Pesquisadores em Neurociência e Farmacologia
+- Avaliar efeitos de drogas em comportamento motor
+- Quantificar ansiedade em testes de labirinto elevado
+- Estudar memória espacial em labirintos aquáticos
+
+### Pesquisadores em Etologia
+- Analisar padrões de exploração espacial
+- Quantificar comportamentos sociais
+- Estudar preferências de habitat
+
+### Desenvolvedores e Bioinformatas
+- Integrar análises comportamentais em pipelines maiores
+- Desenvolver novas análises customizadas
+- Automatizar processamento em larga escala
+
+### Estudantes e Educadores
+- Aprender conceitos de visão computacional aplicada
+- Ensinar metodologia científica quantitativa
+- Demonstrar análise comportamental automatizada
+
+## 🔬 Casos de Uso
+
+### 1. Teste de Labirinto em Y (Alternação Espontânea)
+
+**Objetivo**: Avaliar memória de trabalho espacial
+
+**Fluxo**:
+1. Abrir vídeo do experimento
+2. Calibrar escala espacial
+3. Definir zonas: braço esquerdo, direito, centro
+4. Configurar rastreamento do animal
+5. Executar análise de "Alternação Espontânea"
+6. Exportar dados: sequência de visitas, % de alternação
+
+**Saída**: CSV com eventos de entrada/saída + relatório estatístico
+
+### 2. Teste de Campo Aberto (Ansiedade)
+
+**Objetivo**: Quantificar comportamento exploratório e ansiedade
+
+**Fluxo**:
+1. Abrir vídeo da arena
+2. Definir zonas: centro (aversivo) e periferia (preferencial)
+3. Rastrear posição e movimento do animal
+4. Gerar análises: tempo em cada zona, distância percorrida, velocidade média
+5. Criar mapa de calor da ocupação espacial
+6. Exportar gráficos e dados estatísticos
+
+**Saída**: Mapa de calor (PNG/SVG) + CSV com métricas temporais
+
+### 3. Processamento Automatizado via CLI
+
+**Objetivo**: Processar vídeos sem interface gráfica em scripts automatizados
+
+**Fluxo**:
+1. Criar arquivo de configuração de pipeline (JSON)
+2. Executar via CLI para cada vídeo:
+   ```bash
+   # Processar vídeo individual
+   ./gradlew :MouseGlob:runCli -- \
+     --input experiment-001.mp4 \
+     --output results-001.csv \
+     --pipeline custom-pipeline.json \
+     --tracker-size 20
+
+   # Ou exportar em NDJSON
+   ./gradlew :MouseGlob:runCli -- \
+     --input experiment-001.mp4 \
+     --output trajectory-001.ndjson \
+     --ndjson
+   ```
+3. Processar múltiplos vídeos via script bash/python:
+   ```bash
+   # Script bash para processar múltiplos vídeos
+   for video in videos/*.mp4; do
+     name=$(basename "$video" .mp4)
+     ./gradlew :MouseGlob:runCli -- \
+       --input "$video" \
+       --output "results/${name}.csv"
+   done
+   ```
+4. Consolidar resultados CSV para análise estatística (R/Python)
+
+**Saída**: Um arquivo CSV ou NDJSON por vídeo processado
+
+### 4. Desenvolvimento de Análise Customizada
+
+**Objetivo**: Implementar métrica comportamental específica
+
+**Fluxo**:
+1. Criar classe implementando `Analysis`
+2. Anotar com `@AnalysisInfo`
+3. Implementar cálculo baseado em trajetórias
+4. Registrar via `META-INF/services/dcc.mouseglob.analysis.spi.AnalysisProvider`
+5. Compilar e testar na UI
+6. Compartilhar como plugin externo
+
+**Benefício**: Extensibilidade sem modificar código-fonte
+
+## 🚀 Instalação e Execução
+
+### Pré-requisitos
+
+- **JDK 21** ou superior ([Download Adoptium](https://adoptium.net/))
+- **Gradle 8.5+** (incluído via wrapper)
+- **FFmpeg** (para reprodução de vídeos)
+- **OpenCV** (para captura de câmera - opcional)
+
+### Compilar e Executar
+
+#### Linux / macOS
+
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/mouseglob.git
 cd mouseglob
+
+# Compile o projeto
 ./gradlew build
+
+# Execute a aplicação
 ./gradlew :MouseGlob:run
 ```
 
-#### Opção 3: Docker no Windows
-Use Docker Desktop para Windows:
+#### Windows
 
-```dockerfile
-# Criar arquivo Dockerfile
-FROM eclipse-temurin:21-jdk
-
-WORKDIR /app
-COPY . .
-
-RUN ./gradlew build
-
-CMD ["./gradlew", ":MouseGlob:run"]
-```
-
-```powershell
-# Build e execução
-docker build -t mouseglob .
-docker run -it mouseglob
-```
-
-### Observações para Windows
-- Os caminhos de configuração ficam em `%USERPROFILE%\.mouseglob\`
-- Logs ficam em `%USERPROFILE%\.mouseglob\logs\`
-- Use `\` (barra invertida) ou `/` (barra) nos caminhos - Java aceita ambos no Windows
-- Para GUI, certifique-se de ter suporte a X11 (necessário no WSL/Docker)
-
-### Gerando Executável Windows (.exe)
-
-O projeto suporta geração de instalador nativo Windows que **não requer Java instalado** no sistema do usuário.
-
-**⚠️ IMPORTANTE:** O jpackage só gera instaladores nativos para o SO em que está rodando. Para gerar `.exe`/`.msi` para Windows, você precisa rodar em uma máquina Windows.
-
-#### Opção A: Gerar automaticamente via GitHub Actions (Recomendado - funciona de qualquer OS)
-
-1. Faça push do código para o GitHub
-2. Vá em: **Actions** → **Build Windows Executable** → **Run workflow**
-3. Aguarde ~5-10 minutos
-4. Baixe os arquivos gerados em **Artifacts**:
-   - `MouseGlob-Windows-Installer.zip` (contém o `.msi`)
-   - `MouseGlob-Windows-Standalone.zip` (contém o `.exe`)
-
-**Você pode fazer isso do Mac, Linux ou qualquer lugar!**
-
-#### Opção B: Gerar localmente em uma máquina Windows
-
-**Passo 1:** Instalar WiX Toolset (apenas na primeira vez)
-1. Baixe o [WiX Toolset v3.x](https://github.com/wixtoolset/wix3/releases)
-2. Instale e adicione ao PATH do sistema
-
-**Passo 2:** Gerar o instalador
 ```cmd
-REM Opção 1: Usar script automatizado
-build-windows-exe.bat
+REM Clone o repositório
+git clone https://github.com/seu-usuario/mouseglob.git
+cd mouseglob
 
-REM Opção 2: Comando manual
+REM Compile o projeto
+gradlew.bat build
+
+REM Execute a aplicação
+gradlew.bat :MouseGlob:run
+```
+
+### Instalador Windows (sem JDK)
+
+Usuários Windows podem baixar o instalador `.msi` que **não requer Java instalado**:
+
+1. Acesse a [página de Releases](https://github.com/seu-usuario/mouseglob/releases)
+2. Baixe `MouseGlob-Windows-Installer.zip`
+3. Extraia e execute o `.msi`
+4. A aplicação será instalada com JRE embutido
+
+Ou gere localmente:
+
+```cmd
+REM Requer WiX Toolset instalado
 gradlew.bat jpackage
 ```
 
-#### O que é gerado:
-- **Instalador MSI**: `MouseGlob\build\jpackage\MouseGlob-2.0.1.msi`
-  - Instala a aplicação no sistema
-  - Cria atalho no menu iniciar
-  - Inclui JRE embutido (não precisa de Java instalado)
-  - ~200-300 MB (inclui todas as dependências)
+Instalador gerado em: `MouseGlob\build\jpackage\MouseGlob-2.0.1.msi`
 
-- **Imagem standalone**: `MouseGlob\build\jpackage\MouseGlob\bin\MouseGlob.exe`
-  - Executável direto sem instalação
-  - Pode ser copiado para outro computador Windows
-  - Também inclui JRE embutido
+### Docker
 
-#### Distribuindo para outros usuários:
-1. Compartilhe o arquivo `.msi`
-2. Usuário executa o `.msi` e instala normalmente
-3. Aplicação aparece no Menu Iniciar
-4. **Não é necessário ter Java instalado!**
+```bash
+# Build da imagem
+docker build -t mouseglob .
 
-#### Tamanho do instalador:
-- Com JRE embutido: ~250-350 MB
-- Sem JRE (requer Java no sistema): adicione `--no-runtime` nas `installerOptions`
+# Execute (GUI requer X11 forwarding)
+docker run -it --rm \
+  -e DISPLAY=$DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  mouseglob
+```
+
+## 📖 Guia Rápido
+
+### 1. Primeiro Uso: Analisar um Vídeo
+
+1. **Abrir vídeo**: Menu `Arquivo > Abrir Vídeo` (ou arraste o arquivo para a janela)
+
+2. **Calibrar escala**:
+   - Vá para o painel "Calibração"
+   - Desenhe uma linha de tamanho conhecido no vídeo
+   - Insira o tamanho real (ex: 50 cm)
+   - Clique em "Salvar Calibração"
+
+3. **Definir arena/zonas**:
+   - Painel "Maze/Zonas"
+   - Desenhe o limite da arena (boundary)
+   - Adicione zonas de interesse (clique direito > "Adicionar Zona")
+   - Nomeie as zonas (ex: "Centro", "Periferia")
+
+4. **Configurar rastreamento**:
+   - Painel "Rastreamento"
+   - Ajuste parâmetros (threshold, tamanho mínimo/máximo do objeto)
+   - Clique em "Iniciar Rastreamento"
+
+5. **Executar análises**:
+   - Painel "Análises"
+   - Selecione análises desejadas (ex: "Velocidade", "Distância Percorrida")
+   - Clique em "Executar"
+
+6. **Exportar resultados**:
+   - Painel "Relatórios"
+   - Clique direito no gráfico > "Export CSV"
+   - Salve trajetórias: Menu `Arquivo > Exportar Trajetórias` (NDJSON)
+
+### 2. Reutilizar Configuração
+
+Para aplicar as mesmas configurações em novos vídeos:
+
+1. Salve o experimento: `Arquivo > Salvar Experimento`
+2. Para novo vídeo: `Arquivo > Abrir Experimento` (carrega zonas, calibração, análises)
+3. Apenas troque o vídeo: `Arquivo > Abrir Vídeo`
+
+### 3. Personalizar Pipeline de Processamento
+
+Edite `MouseGlob/src/resource/pipelines/default.json`:
+
+```json
+{
+  "stages": [
+    { "type": "grayscale" },
+    { "type": "background", "mode": "running", "alpha": 0.03 },
+    { "type": "adaptiveThreshold", "mode": "adaptiveMean", "dark": true, "blockSize": 21, "c": 10 },
+    { "type": "morphology", "operation": "close", "kernel": "5x5" }
+  ]
+}
+```
+
+Parâmetros ajustáveis:
+- `alpha`: taxa de atualização do fundo (0.01-0.1)
+- `blockSize`: tamanho da janela para threshold adaptativo (ímpar, ex: 11, 15, 21)
+- `c`: constante de ajuste do threshold (-20 a 20)
+- `kernel`: tamanho do kernel morfológico (3x3, 5x5, 7x7)
+
+## 🏗️ Arquitetura
+
+MouseGlob utiliza uma arquitetura modular em camadas:
+
+```
+┌────────────────────────────────────────┐
+│     UI Layer (Swing + Processing)      │  Interface gráfica e visualização
+├────────────────────────────────────────┤
+│   Business Logic / Controllers         │  Orquestração de funcionalidades
+├────────────────────────────────────────┤
+│   Domain Models / Events               │  Modelos de domínio e eventos
+├────────────────────────────────────────┤
+│   I/O & Persistence                    │  Leitura/escrita de dados
+├────────────────────────────────────────┤
+│   Infrastructure (DI, Logging)         │  Serviços transversais
+└────────────────────────────────────────┘
+```
+
+### Módulos Principais
+
+- **MouseGlob**: Aplicação principal (UI, análises, rastreamento)
+- **Injection**: Framework de injeção de dependências customizado
+
+### Padrões de Design
+
+- **Event-Driven Architecture**: Comunicação via eventos e listeners
+- **Pipeline Pattern**: Processamento modular e configurável de frames
+- **Service Provider Interface (SPI)**: Sistema de plugins extensível
+- **Module-View-Controller**: Separação clara de responsabilidades
+
+Para detalhes técnicos completos, consulte [CLAUDE.md](CLAUDE.md).
+
+## 🤝 Contribuição
+
+Contribuições são muito bem-vindas! Veja como contribuir:
+
+### Reportar Bugs
+
+Abra uma issue no GitHub com:
+- Descrição clara do problema
+- Passos para reproduzir
+- Logs relevantes (em `~/.mouseglob/logs/`)
+- Versão do Java e sistema operacional
+
+### Sugerir Funcionalidades
+
+Crie uma issue descrevendo:
+- Caso de uso científico
+- Funcionalidade desejada
+- Benefícios esperados
+
+### Contribuir com Código
+
+1. Fork o repositório
+2. Crie uma branch: `git checkout -b minha-feature`
+3. Implemente com testes
+4. Commit: `git commit -m "feat: adiciona análise XYZ"`
+5. Push: `git push origin minha-feature`
+6. Abra um Pull Request
+
+### Desenvolver Plugins
+
+Crie análises customizadas sem modificar o código-fonte:
+
+1. Implemente `dcc.mouseglob.analysis.Analysis`
+2. Anote com `@AnalysisInfo`
+3. Registre via `META-INF/services/dcc.mouseglob.analysis.spi.AnalysisProvider`
+4. Publique como biblioteca separada
+
+Veja [CLAUDE.md](CLAUDE.md) para guia detalhado de desenvolvimento.
+
+## 📚 Documentação Técnica
+
+- **[CLAUDE.md](CLAUDE.md)**: Documentação completa para desenvolvedores (arquitetura, APIs, guias técnicos)
+- **[revision.md](revision.md)**: Histórico de decisões de design e melhorias planejadas
+- **[TODO.txt](TODO.txt)**: Lista de tarefas e roadmap
+
+### Documentação de APIs
+
+- [JSON Schemas](MouseGlob/src/resource/schemas/): Especificação de formatos de dados
+  - `trajectory.schema.json`: Formato de trajetórias NDJSON
+  - `experiment.schema.json`: Metadados de experimento
+
+### Guias Específicos
+
+- [Pipeline de Processamento](CLAUDE.md#pipeline-de-processamento)
+- [Sistema de Plugins](CLAUDE.md#sistema-de-plugins)
+- [Formatos de Exportação](CLAUDE.md#formatos-de-exportação)
+- [CI/CD e Builds](CLAUDE.md#cicd)
+
+## 📄 Licença
+
+Este projeto é distribuído sob a **Apache License 2.0**. Veja [LICENSE](LICENSE) para o texto completo da licença.
+
+**Por que Apache 2.0?**
+Esta licença foi escolhida para maximizar a adoção científica e colaboração, permitindo uso em contextos acadêmicos, comerciais e industriais sem barreiras legais.
+
+**Resumo da Apache 2.0:**
+- ✅ **Uso comercial**: Use livremente em produtos comerciais
+- ✅ **Modificação**: Altere o código conforme necessário
+- ✅ **Distribuição**: Compartilhe o software original ou modificado
+- ✅ **Uso de patentes**: Proteção contra litígios de patentes
+- ✅ **Uso privado**: Use e modifique internamente sem obrigação de compartilhar
+- ⚠️ **Aviso de mudanças**: Documente arquivos modificados
+- ⚠️ **Manter licença e avisos**: Inclua LICENSE e NOTICE em distribuições
+- ⚠️ **Sem uso de marca**: Não use "MouseGlob" como marca sem permissão
+
+**Compatibilidade**: Apache 2.0 é compatível com GPLv3, MIT, BSD e a maioria das licenças open source.
+
+## 🙏 Agradecimentos
+
+MouseGlob utiliza as seguintes bibliotecas open-source:
+
+- [Processing](https://processing.org/) - Visualização e renderização
+- [JavaCV](https://github.com/bytedeco/javacv) - Processamento de vídeo (FFmpeg/OpenCV)
+- [FlatLaf](https://www.formdev.com/flatlaf/) - Look and Feel moderno
+- [Jackson](https://github.com/FasterXML/jackson) - Serialização JSON
+- [SLF4J](https://www.slf4j.org/) / [Logback](https://logback.qos.ch/) - Logging
+
+## 📞 Contato e Suporte
+
+- **Issues**: [GitHub Issues](https://github.com/seu-usuario/mouseglob/issues)
+- **Discussões**: [GitHub Discussions](https://github.com/seu-usuario/mouseglob/discussions)
+- **Email**: [seu-email@example.com](mailto:seu-email@example.com)
+
+---
+
+**Desenvolvido com ❤️ para a comunidade científica open-source**
