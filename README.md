@@ -4,7 +4,7 @@
 
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://adoptium.net/)
 [![Gradle](https://img.shields.io/badge/Gradle-8.5+-blue.svg)](https://gradle.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](license.txt)
 
 ## 📋 Índice
 
@@ -442,7 +442,16 @@ Veja [CLAUDE.md](CLAUDE.md) para guia detalhado de desenvolvimento.
 
 ## 📄 Licença
 
-Este projeto é distribuído sob a licença MIT. Veja [LICENSE](LICENSE) para mais detalhes.
+Este projeto é distribuído sob a licença GNU General Public License v3.0. Veja [license.txt](license.txt) para o texto completo da licença.
+
+**Resumo da GPLv3:**
+- ✅ Uso comercial permitido
+- ✅ Modificação permitida
+- ✅ Distribuição permitida
+- ✅ Uso de patentes permitido
+- ⚠️ Modificações devem ser disponibilizadas sob a mesma licença (copyleft)
+- ⚠️ Código-fonte deve ser disponibilizado
+- ⚠️ Mudanças devem ser documentadas
 
 ## 🙏 Agradecimentos
 

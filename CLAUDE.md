@@ -1803,6 +1803,6 @@ Para questões técnicas, bugs ou contribuições:
 
 **Este documento é vivo e deve ser atualizado conforme o projeto evolui.**
 
-**Última atualização**: 2025-11-23
+**Última atualização**: 2025-11-24
 **Mantenedores**: [Lista de mantenedores]
-**Licença**: MIT
+**Licença**: GNU General Public License v3.0 (GPLv3) - veja [license.txt](license.txt)
