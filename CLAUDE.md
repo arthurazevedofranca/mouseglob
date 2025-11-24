@@ -312,11 +312,22 @@ java -jar MouseGlob/build/libs/MouseGlob.jar
 ```
 **Classe**: `dcc.mouseglob.MouseGlob.main()`
 
-#### CLI (headless/batch)
+#### CLI (headless)
 ```bash
-./gradlew :MouseGlob:runCli -- --batch --input videos/ --output results/
+# Processar um vídeo
+./gradlew :MouseGlob:runCli -- --input video.mp4 --output results.csv
+
+# Com opções adicionais
+./gradlew :MouseGlob:runCli -- --input video.mp4 --output trajectory.ndjson --ndjson --pipeline custom.json
 ```
 **Classe**: `dcc.mouseglob.cli.MouseGlobCLI.main()`
+
+**Flags disponíveis**:
+- `--input <file>` (obrigatório): Arquivo de vídeo de entrada
+- `--output <file>` (obrigatório): Arquivo de saída (CSV ou NDJSON)
+- `--ndjson` (opcional): Exportar em formato NDJSON ao invés de CSV
+- `--pipeline <file>` (opcional): Caminho para arquivo JSON de pipeline customizado
+- `--tracker-size <int>` (opcional): Tamanho do rastreador em pixels
 
 #### Testes
 ```bash
@@ -1710,7 +1721,17 @@ Ver seção [3.5 Debugging do Pipeline](#35-debugging-do-pipeline)
 
 ### Como executo em modo headless (sem GUI)?
 ```bash
-./gradlew :MouseGlob:runCli -- --batch --input videos/ --output results/
+# Processar um vídeo
+./gradlew :MouseGlob:runCli -- --input video.mp4 --output results.csv
+
+# Com pipeline customizado e NDJSON
+./gradlew :MouseGlob:runCli -- --input video.mp4 --output trajectory.ndjson --ndjson --pipeline custom.json
+
+# Processar múltiplos vídeos via script
+for video in videos/*.mp4; do
+  name=$(basename "$video" .mp4)
+  ./gradlew :MouseGlob:runCli -- --input "$video" --output "results/${name}.csv"
+done
 ```
 
 ### Como adiciono uma nova dependência Maven?

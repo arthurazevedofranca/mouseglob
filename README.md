@@ -126,11 +126,18 @@ public class MinhaAnalise extends AbstractAnalysis {
 }
 ```
 
-### Modo Batch (CLI)
-Processe múltiplos vídeos sem interface gráfica:
+### Modo CLI (Headless)
+Processe vídeos sem interface gráfica:
 
 ```bash
-./gradlew :MouseGlob:runCli -- --batch --input videos/ --output results/
+# Processar um vídeo e exportar para CSV
+./gradlew :MouseGlob:runCli -- --input video.mp4 --output results.csv
+
+# Exportar para NDJSON
+./gradlew :MouseGlob:runCli -- --input video.mp4 --output trajectory.ndjson --ndjson
+
+# Com pipeline customizado
+./gradlew :MouseGlob:runCli -- --input video.mp4 --output results.csv --pipeline custom-pipeline.json
 ```
 
 ## 👥 Público-Alvo
@@ -185,24 +192,40 @@ Processe múltiplos vídeos sem interface gráfica:
 
 **Saída**: Mapa de calor (PNG/SVG) + CSV com métricas temporais
 
-### 3. Processamento em Lote de Múltiplos Experimentos
+### 3. Processamento Automatizado via CLI
 
-**Objetivo**: Analisar dezenas de vídeos com configurações padronizadas
+**Objetivo**: Processar vídeos sem interface gráfica em scripts automatizados
 
 **Fluxo**:
 1. Criar arquivo de configuração de pipeline (JSON)
-2. Definir template de zonas e calibração
-3. Executar modo batch via CLI:
+2. Executar via CLI para cada vídeo:
    ```bash
+   # Processar vídeo individual
    ./gradlew :MouseGlob:runCli -- \
-     --batch \
-     --config experiment-template.json \
-     --input-dir /data/videos/ \
-     --output-dir /data/results/
+     --input experiment-001.mp4 \
+     --output results-001.csv \
+     --pipeline custom-pipeline.json \
+     --tracker-size 20
+
+   # Ou exportar em NDJSON
+   ./gradlew :MouseGlob:runCli -- \
+     --input experiment-001.mp4 \
+     --output trajectory-001.ndjson \
+     --ndjson
+   ```
+3. Processar múltiplos vídeos via script bash/python:
+   ```bash
+   # Script bash para processar múltiplos vídeos
+   for video in videos/*.mp4; do
+     name=$(basename "$video" .mp4)
+     ./gradlew :MouseGlob:runCli -- \
+       --input "$video" \
+       --output "results/${name}.csv"
+   done
    ```
 4. Consolidar resultados CSV para análise estatística (R/Python)
 
-**Saída**: Diretório com resultados individuais + consolidado
+**Saída**: Um arquivo CSV ou NDJSON por vídeo processado
 
 ### 4. Desenvolvimento de Análise Customizada
 
